@@ -17,7 +17,7 @@ abstract class AbstractLocaleProvider extends Object implements LocaleProvider {
 
         if(!isset($localeList[$locale])) {
             user_error(
-                "LocaleProviderSession::set_default_locale(): '$locale' is not a valid locale.",
+                __METHOD__ . " '$locale' is not a valid locale.",
                 E_USER_WARNING
             );
         }

@@ -44,8 +44,8 @@ class LocaleProviderMulti extends Object implements LocaleProvider, LocaleStore 
 
                 $locale = $className::get_locale();
 
-                // if result was not false and we only match first then don't check other providers.
-                if ((false !== $locale) && $matchFirst) {
+                // if result was found (not false or null) and we only match first then don't check other providers.
+                if ($locale && $matchFirst) {
                     break;
                 }
             }
