@@ -57,11 +57,13 @@ class LocaleProviderRequestVars extends AbstractLocaleProvider {
             if ($requestVars) {
                 foreach ($checkVars as $checkName => $notused) {
                     // finally found a matching value or maybe empty so set to null
-                    $value = $requestVars[$checkName] ?: null;
+                    if (array_key_exists($checkName, $requestVars)) {
+                        $value = $requestVars[$checkName] ?: null;
 
-                    if ($matchFirst) {
-                        // break out on first found if matchFirst
-                        break;
+                        if ($matchFirst) {
+                            // break out on first found if matchFirst
+                            break;
+                        }
                     }
                 }
             }

@@ -16,4 +16,5 @@ interface LocaleStore {
      * @return boolean|null
      */
     public static function set_locale($locale);
+
 }

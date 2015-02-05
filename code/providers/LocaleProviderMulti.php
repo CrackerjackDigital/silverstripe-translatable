@@ -11,7 +11,22 @@ class LocaleProviderMulti extends Object implements LocaleProvider, LocaleStore 
     private static $stores = [];
 
     /**
-     * Return the current locale tfrom a set of registered locale providers via config.providers
+     * Get the locale from the store, return the first locale found (i.e. get_locale returns !== false).
+     * @return string|bool
+     */
+    public static function get_stored() {
+        foreach (self::config()->stores as $className) {
+            if (singleton($className) instanceof LocaleStore) {
+                if (false !== ($locale = $className::get_locale())) {
+                    return $locale;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Return the current locale from a set of registered locale providers via config.providers
      *
      * - null (missing data) if there was a request but no or invalid locale (e.g. locale= ) on query string.
      * - false (no field) if no value could be decoded by this provider (i.e. no locale= at all) on query string.

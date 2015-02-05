@@ -198,7 +198,6 @@ class Translatable extends DataExtension implements PermissionProvider, LocalePr
 	 */
 	private static $enforce_global_unique_urls = false;
 
-
 	/**
 	 * Reset static configuration variables to their default values
 	 */
@@ -216,9 +215,9 @@ class Translatable extends DataExtension implements PermissionProvider, LocalePr
 	static function choose_site_locale($langsAvailable = array()) {
         assert(empty($langsAvailable), "Unimplemented: handling langsAvailable");
 
-		if(!$locale = self::get_locale()) {
+		if(!$locale = self::get_current_locale()) {
             $locale = AbstractLocaleProvider::get_locale();
-            self::set_current_locale($locale);
+            AbstractLocaleProvider::set_locale($locale);
         }
 		return $locale;
 	}
@@ -255,6 +254,10 @@ class Translatable extends DataExtension implements PermissionProvider, LocalePr
 		return AbstractLocaleProvider::get_locale();
 	}
 
+    static function get_stored() {
+        return AbstractLocaleProvider::get_stored();
+    }
+
 	/**
 	 * Set the reading language, either namespaced to 'site' (website content)
 	 * or 'cms' (management backend). This value is used in {@link augmentSQL()}
@@ -268,7 +271,7 @@ class Translatable extends DataExtension implements PermissionProvider, LocalePr
 	}
 
     /**
-     * To keep Tranlatable interface in place, calls through to get_locale.
+     * To keep Translatable interface in place, calls through to get_locale.
      * @return string
      */
     static function get_current_locale() {
@@ -283,7 +286,24 @@ class Translatable extends DataExtension implements PermissionProvider, LocalePr
         self::set_locale($locale);
     }
 
-	/**
+    /**
+     * Set up i18n and Translatable modules using CurrentRegionLocale from the Store. This
+     * bypasses providers checking e.g. urls params etc and configures the last set locale
+     * instead for before other processing has begun.
+     *
+     * @return string stored locale e.g. 'en_NZ'
+     */
+    public static function configureLocalisationFromStore() {
+        $locale = AbstractLocaleProvider::get_stored();
+        i18n::set_locale($locale);
+        Translatable::set_current_locale($locale);
+        Translatable::enable_locale_filter();
+        return $locale;
+    }
+
+
+
+    /**
 	 * Get a singleton instance of a class in the given language.
 	 * @param string $class The name of the class.
 	 * @param string $locale  The name of the language.
@@ -1594,11 +1614,15 @@ class Translatable extends DataExtension implements PermissionProvider, LocalePr
 		$originalLocale = self::get_current_locale();
 
 		self::set_current_locale(self::default_locale());
-		$original = SiteTree::get_by_link(RootURLController::config()->default_homepage_link);
+        $rootControllerHomePageLink = RootURLController::config()->default_homepage_link;
+
+		$original = SiteTree::get_by_link($rootControllerHomePageLink);
 		self::set_current_locale($originalLocale);
 
 		if($original) {
-			if($translation = $original->getTranslation($locale)) return trim($translation->RelativeLink(true), '/');
+			if($translation = $original->getTranslation($locale)) {
+                return trim($translation->RelativeLink(true), '/');
+            }
 		}
 	}
 

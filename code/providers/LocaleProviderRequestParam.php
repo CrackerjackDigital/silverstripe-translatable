@@ -31,9 +31,11 @@ class LocaleProviderRequestParam extends AbstractLocaleProvider {
             }
             $requestParamValue = $requestParams[$requestParamName];
 
+            $map = self::config()->get('request_param_map');
+
             // check to see if we map the url value to a locale internally.
-            if (isset(self::$request_param_map[$requestParamValue])) {
-                return self::$request_param_map[$requestParamValue];
+            if (isset($map[$requestParamValue])) {
+                return $map[$requestParamValue];
             } else {
                 return $requestParamValue;
             }
