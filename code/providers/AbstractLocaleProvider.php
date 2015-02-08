@@ -25,6 +25,14 @@ abstract class AbstractLocaleProvider extends Object implements LocaleProvider {
     }
 
     /**
+     * Return the locale as stored, not from live sources such as URL etc.
+     * @return mixed
+     */
+    public static function get_stored() {
+        return Injector::inst()->get('LocaleProvider')->get_stored();
+    }
+
+    /**
      * Convenience method gets configured LocaleProvider from Injector and return get_locale result on it
      *
      * @return string|null|false see docs for individual LocaleProviders for more info

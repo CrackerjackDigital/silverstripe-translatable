@@ -215,7 +215,9 @@ class Translatable extends DataExtension implements PermissionProvider, LocalePr
 	static function choose_site_locale($langsAvailable = array()) {
         assert(empty($langsAvailable), "Unimplemented: handling langsAvailable");
 
-		if(!$locale = self::get_current_locale()) {
+        // check we have a locale already stored e.g. in session.
+		if(!$locale = AbstractLocaleProvider::get_stored()) {
+            // no locale stored so get from 'live' sources, url etc
             $locale = AbstractLocaleProvider::get_locale();
             AbstractLocaleProvider::set_locale($locale);
         }
@@ -279,11 +281,11 @@ class Translatable extends DataExtension implements PermissionProvider, LocalePr
     }
 
     /**
-     * To keep Tranlatable interface in place, calls through to set_locale.
+     * NOOP, called by framework with bad data ModelAsController:120 use set_locale instead internally.
      * @param $locale to set
      */
     static function set_current_locale($locale) {
-        self::set_locale($locale);
+//        self::set_locale($locale);
     }
 
     /**
@@ -296,7 +298,7 @@ class Translatable extends DataExtension implements PermissionProvider, LocalePr
     public static function configureLocalisationFromStore() {
         $locale = AbstractLocaleProvider::get_stored();
         i18n::set_locale($locale);
-        Translatable::set_current_locale($locale);
+        Translatable::set_locale($locale);
         Translatable::enable_locale_filter();
         return $locale;
     }
@@ -316,13 +318,13 @@ class Translatable extends DataExtension implements PermissionProvider, LocalePr
         AbstractLocaleProvider::validate_locale($locale);
 
 		$orig = Translatable::get_current_locale();
-		Translatable::set_current_locale($locale);
+		Translatable::set_locale($locale);
 		$do = $class::get()
 			->where($filter)
 			->where(sprintf('"Locale" = \'%s\'', Convert::raw2sql($locale)))
 			->sort($orderby)
 			->First();
-		Translatable::set_current_locale($orig);
+		Translatable::set_locale($orig);
 		return $do;
 	}
 
@@ -344,13 +346,13 @@ class Translatable extends DataExtension implements PermissionProvider, LocalePr
         AbstractLocaleProvider::validate_locale($locale);
 
 		$oldLang = self::get_current_locale();
-		self::set_current_locale($locale);
+		self::set_locale($locale);
 		$result = $class::get();
 		if($filter) $result = $result->where($filter);
 		if($sort) $result = $result->sort($sort);
 		if($join) $result = $result->leftJoin($join);
 		if($limit) $result = $result->limit($limit);
-		self::set_current_locale($oldLang);
+		self::set_locale($oldLang);
 
 		return $result;
 	}
@@ -1611,13 +1613,16 @@ class Translatable extends DataExtension implements PermissionProvider, LocalePr
 	 * @return string
 	 */
 	public static function get_homepage_link_by_locale($locale) {
+        if (self::$enforce_global_unique_urls) {
+            return '/home';
+        }
 		$originalLocale = self::get_current_locale();
 
-		self::set_current_locale(self::default_locale());
+		self::set_locale(self::default_locale());
         $rootControllerHomePageLink = RootURLController::config()->default_homepage_link;
 
 		$original = SiteTree::get_by_link($rootControllerHomePageLink);
-		self::set_current_locale($originalLocale);
+		self::set_locale($originalLocale);
 
 		if($original) {
 			if($translation = $original->getTranslation($locale)) {
@@ -1700,7 +1705,7 @@ class Translatable extends DataExtension implements PermissionProvider, LocalePr
 	 * @deprecated 2.4 Use set_current_locale()
 	 */
 	static function set_reading_lang($lang) {
-		self::set_current_locale(i18n::get_locale_from_lang($lang));
+		self::set_locale(i18n::get_locale_from_lang($lang));
 	}
 
 	/**
