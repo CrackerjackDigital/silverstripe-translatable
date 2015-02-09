@@ -258,6 +258,28 @@ class Translatable extends DataExtension implements PermissionProvider, LocalePr
         return AbstractLocaleProvider::get_stored();
     }
 
+    /**
+     * Return SiteConfig with max(ID) for the currently selected locale or optionally specified locale.
+     * @param null|string $locale
+     * @return SiteConfig
+     */
+    static function get_site_config($locale = null) {
+        $locale = $locale ?: Translatable::get_locale();
+        Translatable::disable_locale_filter();
+
+        // site config stores multiple records or 'versions' the one with the highest id is the last one.
+        $siteConfig = SiteConfig::get()
+            ->filter(array(
+                'Locale' => $locale
+            ))
+            ->sort('ID desc')
+            ->limit(1)
+            ->first();
+
+        Translatable::enable_locale_filter();
+        return $siteConfig;
+    }
+
 	/**
 	 * Set the reading language, either namespaced to 'site' (website content)
 	 * or 'cms' (management backend). This value is used in {@link augmentSQL()}
@@ -1231,10 +1253,8 @@ class Translatable extends DataExtension implements PermissionProvider, LocalePr
 		// as we purposely want to get different language
 		// also save state of locale-filter, revert to this state at the
 		// end of this method
-		$localeFilterEnabled = false;
-		if(self::locale_filter_enabled()) {
+		if($localeFilterEnabled = self::locale_filter_enabled()) {
 			self::disable_locale_filter();
-			$localeFilterEnabled = true;
 		}
 
 		$translationGroupID = $this->getTranslationGroup();

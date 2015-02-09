@@ -8,7 +8,7 @@ SiteConfig:
   extensions:
     ['Translatable']
 LeftAndMain:
-  extensions: 
+  extensions:
     ['TranslatableCMSMainExtension']
 HtmlEditorField_Toolbar:
   extensions:
