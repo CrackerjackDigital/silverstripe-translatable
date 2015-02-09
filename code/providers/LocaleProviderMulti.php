@@ -12,11 +12,12 @@ class LocaleProviderMulti extends Object implements LocaleProvider, LocaleStore 
 
     /**
      * Get the locale from the store, return the first locale found (i.e. get_locale returns !== false).
+     * LocaleStores registered in config.stores are checked, but only if they also implement LocaleProvider
      * @return string|bool
      */
     public static function get_stored() {
         foreach (self::config()->stores as $className) {
-            if (singleton($className) instanceof LocaleStore) {
+            if (singleton($className) instanceof LocaleProvider) {
                 if (false !== ($locale = $className::get_locale())) {
                     return $locale;
                 }
