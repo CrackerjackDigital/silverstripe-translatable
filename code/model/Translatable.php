@@ -1631,14 +1631,14 @@ class Translatable extends DataExtension implements PermissionProvider, LocalePr
 	 * @return string
 	 */
 	public static function get_homepage_link_by_locale($locale) {
-        if (self::$enforce_global_unique_urls) {
-            return '/home';
+        $rootControllerHomePageLink = RootURLController::config()->default_homepage_link;
+
+        if(!Config::inst()->get('Translatable', 'enforce_global_unique_urls')) {
+            return $rootControllerHomePageLink;
         }
 		$originalLocale = self::get_current_locale();
 
 		self::set_locale(self::default_locale());
-        $rootControllerHomePageLink = RootURLController::config()->default_homepage_link;
-
 		$original = SiteTree::get_by_link($rootControllerHomePageLink);
 		self::set_locale($originalLocale);
 
