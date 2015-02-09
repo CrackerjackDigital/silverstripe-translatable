@@ -213,8 +213,6 @@ class Translatable extends DataExtension implements PermissionProvider, LocalePr
 	 * @return string Selected language (also saved in $current_locale).
 	 */
 	static function choose_site_locale($langsAvailable = array()) {
-        assert(empty($langsAvailable), "Unimplemented: handling langsAvailable");
-
         // check we have a locale already stored e.g. in session.
 		if(!$locale = AbstractLocaleProvider::get_stored()) {
             // no locale stored so get from 'live' sources, url etc
