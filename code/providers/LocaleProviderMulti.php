@@ -1,14 +1,19 @@
 <?php
 class LocaleProviderMulti extends Object implements LocaleProvider, LocaleStore {
-    // array of provider class names to use e.g. [ 'LocaleProviderRequestVar', 'LocaleProviderSession' ]
-    private static $providers = [];
-
-    // break on first match of a provider returning null or a value.
-    private static $match_first = true;
+    // array of provider class names to use in priority order they will be checked
+    // e.g. [ 'LocaleProviderRequestVar', 'LocaleProviderSession', 'LocaleProviderDefault' ]
+    private static $providers = [
+        'LocaleProviderDefault'
+    ];
 
     // array of 'stores' where locale should be saved to if it is updated, generally only one should be used!
     // NB: LocaleProviderDefault should not be one of these.
-    private static $stores = [];
+    private static $stores = [
+        'LocaleProviderSession'
+    ];
+
+    // break on first match of a provider returning null or a value.
+    private static $match_first = true;
 
     /**
      * Get the locale from the store, return the first locale found (i.e. get_locale returns !== false).
