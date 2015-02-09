@@ -3,6 +3,14 @@
 class LocaleProviderClientGeoIP extends AbstractLocaleProvider {
     // path and filename of geoip data file relative to Director::baseFolder.
     private static $geoip_data_file = '';
+
+    // map country code to a Locale, if GeoIP address not found in map then null will result.
+    private static $country_code_to_locale_map = [
+        'AU' => 'en_AU',
+        'GB' => 'en_GB',
+        'US' => 'en_US',
+        'NZ' => 'en_NZ'
+    ];
     /**
      * Return the locale as found by GeoIP lookup of clients REMOTE_ADDR
      *
@@ -19,7 +27,13 @@ class LocaleProviderClientGeoIP extends AbstractLocaleProvider {
                 $countryCode = geoip_country_code_by_addr($gi, $_SERVER['REMOTE_ADDR']);
                 geoip_close($gi);
 
-                return $countryCode ? "en_$countryCode" : null;
+                if ($countryCode) {
+                    $map = self::config()->get('country_code_to_locale_map');
+                    if (isset($map[$countryCode])) {
+                        return $map[$countryCode];
+                    }
+                }
+                return null;
             }
         }
         return false;
