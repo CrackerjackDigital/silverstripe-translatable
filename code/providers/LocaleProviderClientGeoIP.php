@@ -15,11 +15,12 @@ class LocaleProviderClientGeoIP extends AbstractLocaleProvider {
     public static function get_locale()
     {
         if ($filePathAndName = self::config()->geoip_data_file) {
-            $gi = geoip_open(Director::baseFolder() . $filePathAndName, GEOIP_STANDARD);
-            $countryCode = geoip_country_code_by_addr($gi, $_SERVER['REMOTE_ADDR']);
-            geoip_close($gi);
+            if ($gi = geoip_open(Director::baseFolder() . $filePathAndName, GEOIP_STANDARD)) {
+                $countryCode = geoip_country_code_by_addr($gi, $_SERVER['REMOTE_ADDR']);
+                geoip_close($gi);
 
-            return $countryCode ?: null;
+                return $countryCode ? "en_$countryCode" : null;
+            }
         }
         return false;
     }
