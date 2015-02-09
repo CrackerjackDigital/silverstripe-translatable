@@ -1,7 +1,9 @@
 <?php
 class LocaleProviderDefault extends AbstractLocaleProvider implements LocaleProvider, LocaleStore {
+    // default locale, set to SilverStripe default but should be changed to your site default before Translatable isntalled
     private static $default_locale = 'en_US';
 
+    // override the default
     private static $set_locale;
 
     /**
