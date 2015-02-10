@@ -1,5 +1,5 @@
 {
-	"name":"silverstripe/translatable",
+	"name":"crackerjackdigital/silverstripe-translatable",
 	"type": "silverstripe-module",
 	"description": "Allows translation of DataObject and SiteTree records into multiple languages ",
 	"keywords": ["silverstripe", "cms", "i18n", "localization", "globalization"],
