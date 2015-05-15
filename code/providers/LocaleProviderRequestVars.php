@@ -68,6 +68,17 @@ class LocaleProviderRequestVars extends AbstractLocaleProvider {
                 }
             }
         }
-        return $value;
+        return static::lookupLocaleFromDecodedResult($value);
+    }
+
+    /**
+     * Once we've decoded the value from the request we may need to do an additional lookup so here is the hook to
+     * override in derived classes.
+     *
+     * @param $value
+     * @return mixed
+     */
+    public static function lookupLocaleFromDecodedResult($locale) {
+        return $locale;
     }
 }

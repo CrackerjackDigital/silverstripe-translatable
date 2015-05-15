@@ -15,6 +15,26 @@ class LocaleProviderMulti extends Object implements LocaleProvider, LocaleStore 
     // break on first match of a provider returning null or a value.
     private static $match_first = true;
 
+
+    public static function set_providers(array $providerClassNames) {
+        Config::inst()->remove(
+            'LocaleProviderMulti',
+            'providers'
+        );
+        Config::inst()->update(
+            'LocaleProviderMulti',
+            'providers',
+            $providerClassNames
+        );
+    }
+    public static function prepend_providers(array $providerClassNames) {
+        $providers = array_merge(
+            $providerClassNames,
+            Config::inst()->get('LocaleProviderMulti', 'providers')
+        );
+        static::set_providers($providers);
+    }
+
     /**
      * Get the locale from the store, return the first locale found (i.e. get_locale returns !== false).
      * LocaleStores registered in config.stores are checked, but only if they also implement LocaleProvider
