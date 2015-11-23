@@ -12,7 +12,7 @@
 			"email" : "ingo@silverstripe.com"
 		}
 	],
-	"require": 
+	"require":
 		{
 			"php": ">=5.3.2",
 			"silverstripe/framework": "~3.1",
@@ -25,6 +25,7 @@
 	},
 	"extra":
 		{
+			"installer-name": "translatable",
 			"screenshots" : ["http://www.silverstripe.org/assets/Uploads/translatable4-small.png"]
 		},
 	"support": {
