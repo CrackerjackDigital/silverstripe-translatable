@@ -13,11 +13,11 @@ class LocaleProviderClientGeoIP extends AbstractLocaleProvider {
     ];
 
     private static $server_vars_for_remote_address = [
-        'REMOTE_ADDR',
         'HTTP_CLIENT_IP',
         'HTTP_X_FORWARDED_FOR',
         'X-FORWARDED_FOR',
         'X-Forwarded-For',
+        'REMOTE_ADDR',
     ];
     /**
      * Return the locale as found by GeoIP lookup of clients REMOTE_ADDR
