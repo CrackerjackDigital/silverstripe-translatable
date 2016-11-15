@@ -11,6 +11,13 @@ class LocaleProviderClientGeoIP extends AbstractLocaleProvider {
         'US' => 'en_US',
         'NZ' => 'en_NZ'
     ];
+
+    private static $server_vars_for_remote_address = [
+        'REMOTE_ADDR',
+        'HTTP_CLIENT_IP',
+        'X-FORWARDED_FOR',
+        'X-Forwarded-For',
+    ];
     /**
      * Return the locale as found by GeoIP lookup of clients REMOTE_ADDR
      *
@@ -23,19 +30,39 @@ class LocaleProviderClientGeoIP extends AbstractLocaleProvider {
     public static function get_locale()
     {
         if ($filePathAndName = self::config()->geoip_data_file) {
-            if ($gi = geoip_open(Director::baseFolder() . $filePathAndName, GEOIP_STANDARD)) {
-                $countryCode = geoip_country_code_by_addr($gi, $_SERVER['REMOTE_ADDR']);
-                geoip_close($gi);
+	        
+	        if ($remoteAddress = static::remote_address()) {
 
-                if ($countryCode) {
-                    $map = self::config()->get('country_code_to_locale_map');
-                    if (isset($map[$countryCode])) {
-                        return $map[$countryCode];
+		        if ($gi = geoip_open(Director::baseFolder() . $filePathAndName, GEOIP_STANDARD)) {
+
+                    $countryCode = geoip_country_code_by_addr($gi, $remoteAddress);
+                    geoip_close($gi);
+
+                    if ($countryCode) {
+                        $map = self::config()->get('country_code_to_locale_map');
+                        if (isset($map[ $countryCode ])) {
+                            return $map[ $countryCode ];
+                        }
                     }
+                    return null;
                 }
-                return null;
             }
         }
         return false;
+    }
+
+    /**
+     * Find the remote client ip from server variable names as configured.
+     * @param string $configName
+     * @return string|void IP address or void
+     */
+    private static function remote_address($configName = 'server_vars_for_remote_address') {
+        $varNames = static::config()->get($configName) ?: [];
+
+        foreach ($varNames as $varName) {
+            if (isset($_SERVER[$varName])) {
+                return $_SERVER[$varName];
+            }
+        }
     }
 }
