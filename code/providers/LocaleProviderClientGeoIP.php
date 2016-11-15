@@ -15,6 +15,7 @@ class LocaleProviderClientGeoIP extends AbstractLocaleProvider {
     private static $server_vars_for_remote_address = [
         'REMOTE_ADDR',
         'HTTP_CLIENT_IP',
+        'HTTP_X_FORWARDED_FOR',
         'X-FORWARDED_FOR',
         'X-Forwarded-For',
     ];
@@ -30,7 +31,7 @@ class LocaleProviderClientGeoIP extends AbstractLocaleProvider {
     public static function get_locale()
     {
         if ($filePathAndName = self::config()->geoip_data_file) {
-	        
+
 	        if ($remoteAddress = static::remote_address()) {
 
 		        if ($gi = geoip_open(Director::baseFolder() . $filePathAndName, GEOIP_STANDARD)) {
